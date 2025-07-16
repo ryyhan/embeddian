@@ -5,10 +5,10 @@ BACKEND_URL = "http://localhost:8000"
 
 st.title("Text Tools Suite")
 
-# Tabs for each tool
-tab1, tab2 = st.tabs(["Token Calculator", "Cosine Similarity"])
+# Sidebar tool selection
+selected_tool = st.sidebar.radio("Select a tool:", ["Token Calculator", "Cosine Similarity"])
 
-with tab1:
+if selected_tool == "Token Calculator":
     st.header("Token Calculator")
     text = st.text_area("Enter text to count tokens:")
     if st.button("Calculate Tokens"):
@@ -21,7 +21,7 @@ with tab1:
         else:
             st.warning("Please enter some text.")
 
-with tab2:
+elif selected_tool == "Cosine Similarity":
     st.header("Cosine Similarity")
     text1 = st.text_area("Text 1:", key="text1")
     text2 = st.text_area("Text 2:", key="text2")
