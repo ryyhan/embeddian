@@ -9,6 +9,7 @@ app = FastAPI()
 
 class TokenizeRequest(BaseModel):
     text: str
+    model: str
 
 class CosineSimilarityRequest(BaseModel):
     text1: str
@@ -16,8 +17,10 @@ class CosineSimilarityRequest(BaseModel):
 
 @app.post("/tokenize")
 def tokenize(request: TokenizeRequest) -> Dict[str, int]:
-    # Use tiktoken for OpenAI GPT-3.5/4 tokenization
-    encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
+    try:
+        encoding = tiktoken.encoding_for_model(request.model)
+    except Exception:
+        raise HTTPException(status_code=400, detail=f"Unsupported or unknown model: {request.model}")
     tokens = encoding.encode(request.text)
     return {"token_count": len(tokens)}
 
