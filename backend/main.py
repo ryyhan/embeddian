@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import Dict
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import tiktoken
 
 app = FastAPI()
 
@@ -15,7 +16,9 @@ class CosineSimilarityRequest(BaseModel):
 
 @app.post("/tokenize")
 def tokenize(request: TokenizeRequest) -> Dict[str, int]:
-    tokens = request.text.split()
+    # Use tiktoken for OpenAI GPT-3.5/4 tokenization
+    encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
+    tokens = encoding.encode(request.text)
     return {"token_count": len(tokens)}
 
 @app.post("/cosine-similarity")
