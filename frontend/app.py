@@ -8,9 +8,6 @@ st.title("Embeddian!")
 # Sidebar tool selection
 selected_tool = st.sidebar.radio("Select a tool:", ["Token Calculator", "Cosine Similarity"])
 
-# Model provider selection
-provider = st.sidebar.selectbox("Model Provider", ["OpenAI", "Hugging Face"])
-
 # OpenAI model categories (as per official token calculator)
 openai_model_categories = {
     "GPT-4o & GPT-4o mini": "gpt-4o",  # Use gpt-4o as representative
@@ -65,6 +62,8 @@ hf_models = [
 
 if selected_tool == "Token Calculator":
     st.header("Token Calculator")
+    # Model provider selection (only for Token Calculator)
+    provider = st.sidebar.selectbox("Model Provider", ["OpenAI", "Hugging Face"])
     if provider == "OpenAI":
         category = st.sidebar.selectbox("OpenAI Model", list(openai_model_categories.keys()))
         model = openai_model_categories[category]
