@@ -6,10 +6,16 @@ BACKEND_URL = "http://localhost:8000"
 st.title("Embeddian!")
 
 # Sidebar tool selection
-selected_tool = st.sidebar.radio("Select a tool:", ["Token Calculator", "Cosine Similarity"])
-
-# Model provider selection
-provider = st.sidebar.selectbox("Model Provider", ["OpenAI", "Hugging Face"])
+selected_tool = st.sidebar.radio(
+    "Select a tool:",
+    [
+        "Token Calculator",
+        "Cosine Similarity",
+        "Readability Analyzer",
+        "Keyword/Entity Extractor",
+        "Embedding Visualizer"
+    ]
+)
 
 # OpenAI model categories (as per official token calculator)
 openai_model_categories = {
@@ -65,6 +71,8 @@ hf_models = [
 
 if selected_tool == "Token Calculator":
     st.header("Token Calculator")
+    # Model provider selection (only for Token Calculator)
+    provider = st.sidebar.selectbox("Model Provider", ["OpenAI", "Hugging Face"])
     if provider == "OpenAI":
         category = st.sidebar.selectbox("OpenAI Model", list(openai_model_categories.keys()))
         model = openai_model_categories[category]
@@ -104,3 +112,15 @@ elif selected_tool == "Cosine Similarity":
                 st.error("Error: " + response.text)
         else:
             st.warning("Please enter both texts.")
+
+elif selected_tool == "Readability Analyzer":
+    st.header("Readability Analyzer (Text Complexity)")
+    st.info("This tool will analyze the readability and complexity of your text. (Coming soon)")
+
+elif selected_tool == "Keyword/Entity Extractor":
+    st.header("Keyword/Entity Extractor")
+    st.info("This tool will extract keywords and named entities from your text. (Coming soon)")
+
+elif selected_tool == "Embedding Visualizer":
+    st.header("Embedding Visualizer")
+    st.info("This tool will visualize text embeddings in 2D/3D space. (Coming soon)")
