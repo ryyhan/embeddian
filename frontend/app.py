@@ -3,19 +3,35 @@ import requests
 
 BACKEND_URL = "http://localhost:8000"
 
-st.title("Embeddian!")
+st.set_page_config(page_title="Embeddian! - Text Tools Suite", page_icon="🛠️", layout="wide")
+
+# Tool descriptions
+tool_descriptions = {
+    "Token Calculator": "🔢 **Token Calculator**\n\nCount tokens and characters for your prompt using OpenAI or Hugging Face models. Useful for checking LLM context limits.",
+    "Cosine Similarity": "📏 **Cosine Similarity**\n\nCompare two texts and see how similar they are using cosine similarity.",
+    "Readability Analyzer": "📚 **Readability Analyzer**\n\nAnalyze the readability and complexity of your text using standard metrics.",
+    "Keyword/Entity Extractor": "🔍 **Keyword/Entity Extractor**\n\nExtract keywords and named entities from your text for quick content analysis.",
+    "Embedding Visualizer": "🧭 **Embedding Visualizer**\n\nVisualize text embeddings in 2D/3D space to explore semantic relationships."
+}
+
+# Sidebar layout
+st.sidebar.title("🛠️ Embeddian! Tools")
+st.sidebar.markdown("""
+Welcome to **Embeddian!**
+
+A suite of text tools for LLM and NLP workflows.
+""")
 
 # Sidebar tool selection
 selected_tool = st.sidebar.radio(
     "Select a tool:",
-    [
-        "Token Calculator",
-        "Cosine Similarity",
-        "Readability Analyzer",
-        "Keyword/Entity Extractor",
-        "Embedding Visualizer"
-    ]
+    list(tool_descriptions.keys()),
+    format_func=lambda x: x
 )
+
+# Show tool description in sidebar
+st.sidebar.markdown(tool_descriptions[selected_tool])
+st.sidebar.divider()
 
 # OpenAI model categories (as per official token calculator)
 openai_model_categories = {
@@ -68,6 +84,11 @@ hf_models = [
     "Qwen/Qwen1.5-4B-Chat",
     "Qwen/Qwen1.5-1.8B-Chat"
 ]
+
+# Main area layout
+st.title(f"{selected_tool}")
+st.markdown(tool_descriptions[selected_tool])
+st.divider()
 
 if selected_tool == "Token Calculator":
     st.header("Token Calculator")
