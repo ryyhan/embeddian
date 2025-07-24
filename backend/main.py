@@ -5,6 +5,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import tiktoken
 from transformers import AutoTokenizer
+from sentence_transformers import SentenceTransformer
+import numpy as np
 
 app = FastAPI()
 
@@ -38,10 +40,11 @@ def tokenize(request: TokenizeRequest) -> Dict[str, int]:
 
 @app.post("/cosine-similarity")
 def cosine_similarity_endpoint(request: CosineSimilarityRequest) -> Dict[str, float]:
+    model = SentenceTransformer('all-MiniLM-L6-v2')
     texts = [request.text1, request.text2]
-    vectorizer = CountVectorizer().fit_transform(texts)
-    vectors = vectorizer.toarray()
-    if vectors.shape[0] < 2:
+    embeddings = model.encode(texts)
+    # Compute cosine similarity
+    if embeddings.shape[0] < 2:
         raise HTTPException(status_code=400, detail="Both texts must be non-empty.")
-    cos_sim = cosine_similarity([vectors[0]], [vectors[1]])[0][0]
-    return {"cosine_similarity": float(cos_sim)}
+    cos_sim = float(np.dot(embeddings[0], embeddings[1]) / (np.linalg.norm(embeddings[0]) * np.linalg.norm(embeddings[1])))
+    return {"cosine_similarity": cos_sim}
