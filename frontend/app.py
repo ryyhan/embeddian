@@ -3,21 +3,21 @@ import requests
 
 BACKEND_URL = "http://localhost:8000"
 
-st.set_page_config(page_title="Embeddian! - Text Tools Suite", page_icon="🛠️", layout="wide")
+st.set_page_config(page_title="Embeddian! - Text Tools Suite", page_icon=None, layout="wide")
 
 # Tool descriptions
 tool_descriptions = {
-    "Token Calculator": "🔢 **Token Calculator**\n\nCount tokens and characters for your prompt using OpenAI or Hugging Face models. Useful for checking LLM context limits.",
-    "Cosine Similarity": "📏 **Cosine Similarity**\n\nCompare two texts and see how similar they are using cosine similarity.",
-    "Readability Analyzer": "📚 **Readability Analyzer**\n\nAnalyze the readability and complexity of your text using standard metrics.",
-    "Keyword/Entity Extractor": "🔍 **Keyword/Entity Extractor**\n\nExtract keywords and named entities from your text for quick content analysis.",
-    "Embedding Visualizer": "🧭 **Embedding Visualizer**\n\nVisualize text embeddings in 2D/3D space to explore semantic relationships."
+    "Token Calculator": "Token Calculator\n\nCount tokens and characters for your prompt using OpenAI or Hugging Face models. Useful for checking LLM context limits.",
+    "Cosine Similarity": "Cosine Similarity\n\nCompare two texts and see how similar they are using cosine similarity.",
+    "Readability Analyzer": "Readability Analyzer\n\nAnalyze the readability and complexity of your text using standard metrics.",
+    "Keyword/Entity Extractor": "Keyword/Entity Extractor\n\nExtract keywords and named entities from your text for quick content analysis.",
+    "Embedding Visualizer": "Embedding Visualizer\n\nVisualize text embeddings in 2D/3D space to explore semantic relationships."
 }
 
 # Sidebar layout
-st.sidebar.title("🛠️ Embeddian! Tools")
+st.sidebar.title("Embeddian! Tools")
 st.sidebar.markdown("""
-Welcome to **Embeddian!**
+Welcome to Embeddian!
 
 A suite of text tools for LLM and NLP workflows.
 """)
