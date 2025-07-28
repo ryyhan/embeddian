@@ -7,6 +7,7 @@ import tiktoken
 from transformers import AutoTokenizer
 from sentence_transformers import SentenceTransformer
 import numpy as np
+from textstat import flesch_reading_ease, flesch_kincaid_grade, smog_index, coleman_liau_index, automated_readability_index
 
 app = FastAPI()
 
@@ -18,6 +19,9 @@ class TokenizeRequest(BaseModel):
 class CosineSimilarityRequest(BaseModel):
     text1: str
     text2: str
+
+class ReadabilityRequest(BaseModel):
+    text: str
 
 @app.post("/tokenize")
 def tokenize(request: TokenizeRequest) -> Dict[str, int]:
@@ -48,3 +52,16 @@ def cosine_similarity_endpoint(request: CosineSimilarityRequest) -> Dict[str, fl
         raise HTTPException(status_code=400, detail="Both texts must be non-empty.")
     cos_sim = float(np.dot(embeddings[0], embeddings[1]) / (np.linalg.norm(embeddings[0]) * np.linalg.norm(embeddings[1])))
     return {"cosine_similarity": cos_sim}
+
+@app.post("/readability")
+def readability_endpoint(request: ReadabilityRequest) -> Dict[str, float]:
+    text = request.text
+    if not text or not text.strip():
+        raise HTTPException(status_code=400, detail="Text must not be empty.")
+    return {
+        "flesch_reading_ease": flesch_reading_ease(text),
+        "flesch_kincaid_grade": flesch_kincaid_grade(text),
+        "smog_index": smog_index(text),
+        "coleman_liau_index": coleman_liau_index(text),
+        "automated_readability_index": automated_readability_index(text)
+    }
