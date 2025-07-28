@@ -136,7 +136,22 @@ elif selected_tool == "Cosine Similarity":
 
 elif selected_tool == "Readability Analyzer":
     st.header("Readability Analyzer (Text Complexity)")
-    st.info("This tool will analyze the readability and complexity of your text. (Coming soon)")
+    text = st.text_area("Enter text to analyze readability:")
+    if st.button("Analyze Readability"):
+        if text.strip():
+            response = requests.post(f"{BACKEND_URL}/readability", json={"text": text})
+            if response.ok:
+                data = response.json()
+                st.subheader("Readability Metrics:")
+                st.write(f"Flesch Reading Ease: **{data['flesch_reading_ease']:.2f}**")
+                st.write(f"Flesch-Kincaid Grade: **{data['flesch_kincaid_grade']:.2f}**")
+                st.write(f"SMOG Index: **{data['smog_index']:.2f}**")
+                st.write(f"Coleman-Liau Index: **{data['coleman_liau_index']:.2f}**")
+                st.write(f"Automated Readability Index: **{data['automated_readability_index']:.2f}**")
+            else:
+                st.error("Error: " + response.text)
+        else:
+            st.warning("Please enter some text.")
 
 elif selected_tool == "Keyword/Entity Extractor":
     st.header("Keyword/Entity Extractor")
