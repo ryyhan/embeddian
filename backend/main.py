@@ -8,6 +8,7 @@ from transformers import AutoTokenizer
 from sentence_transformers import SentenceTransformer
 import numpy as np
 from textstat import flesch_reading_ease, flesch_kincaid_grade, smog_index, coleman_liau_index, automated_readability_index
+import spacy
 
 app = FastAPI()
 
@@ -21,6 +22,9 @@ class CosineSimilarityRequest(BaseModel):
     text2: str
 
 class ReadabilityRequest(BaseModel):
+    text: str
+
+class KeywordEntityRequest(BaseModel):
     text: str
 
 @app.post("/tokenize")
@@ -65,3 +69,16 @@ def readability_endpoint(request: ReadabilityRequest) -> Dict[str, float]:
         "coleman_liau_index": coleman_liau_index(text),
         "automated_readability_index": automated_readability_index(text)
     }
+
+@app.post("/extract")
+def extract_keywords_entities(request: KeywordEntityRequest):
+    text = request.text
+    if not text or not text.strip():
+        raise HTTPException(status_code=400, detail="Text must not be empty.")
+    nlp = spacy.load("en_core_web_sm")
+    doc = nlp(text)
+    # Simple keyword extraction: noun chunks
+    keywords = list(set(chunk.text.strip() for chunk in doc.noun_chunks if chunk.text.strip()))
+    # Named entities
+    entities = [{"text": ent.text, "label": ent.label_} for ent in doc.ents]
+    return {"keywords": keywords, "entities": entities}

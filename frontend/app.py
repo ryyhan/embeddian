@@ -155,7 +155,27 @@ elif selected_tool == "Readability Analyzer":
 
 elif selected_tool == "Keyword/Entity Extractor":
     st.header("Keyword/Entity Extractor")
-    st.info("This tool will extract keywords and named entities from your text. (Coming soon)")
+    text = st.text_area("Enter text to extract keywords and entities:")
+    if st.button("Extract Keywords/Entities"):
+        if text.strip():
+            response = requests.post(f"{BACKEND_URL}/extract", json={"text": text})
+            if response.ok:
+                data = response.json()
+                st.subheader("Keywords:")
+                if data["keywords"]:
+                    st.write(", ".join(data["keywords"]))
+                else:
+                    st.write("No keywords found.")
+                st.subheader("Named Entities:")
+                if data["entities"]:
+                    for ent in data["entities"]:
+                        st.write(f"{ent['text']} ({ent['label']})")
+                else:
+                    st.write("No named entities found.")
+            else:
+                st.error("Error: " + response.text)
+        else:
+            st.warning("Please enter some text.")
 
 elif selected_tool == "Embedding Visualizer":
     st.header("Embedding Visualizer")
