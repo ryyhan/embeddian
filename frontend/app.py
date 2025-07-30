@@ -179,4 +179,27 @@ elif selected_tool == "Keyword/Entity Extractor":
 
 elif selected_tool == "Embedding Visualizer":
     st.header("Embedding Visualizer")
-    st.info("This tool will visualize text embeddings in 2D/3D space. (Coming soon)")
+    st.markdown("Enter multiple texts (one per line) to visualize their embeddings in 2D space.")
+    text_input = st.text_area("Enter texts (one per line):")
+    if st.button("Visualize Embeddings"):
+        texts = [t.strip() for t in text_input.splitlines() if t.strip()]
+        if len(texts) < 2:
+            st.warning("Please enter at least two texts.")
+        else:
+            response = requests.post(f"{BACKEND_URL}/embed", json={"texts": texts})
+            if response.ok:
+                data = response.json()
+                import numpy as np
+                from sklearn.decomposition import PCA
+                embeddings = np.array(data["embeddings"])
+                pca = PCA(n_components=2)
+                reduced = pca.fit_transform(embeddings)
+                import pandas as pd
+                df = pd.DataFrame(reduced, columns=["x", "y"])
+                df["text"] = texts
+                st.subheader("2D Embedding Visualization:")
+                st.scatter_chart(df, x="x", y="y")
+                for i, row in df.iterrows():
+                    st.write(f"{row['text']}: ({row['x']:.2f}, {row['y']:.2f})")
+            else:
+                st.error("Error: " + response.text)
