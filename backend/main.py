@@ -27,6 +27,9 @@ class ReadabilityRequest(BaseModel):
 class KeywordEntityRequest(BaseModel):
     text: str
 
+class EmbeddingRequest(BaseModel):
+    texts: list[str]
+
 @app.post("/tokenize")
 def tokenize(request: TokenizeRequest) -> Dict[str, int]:
     char_count = len(request.text)
@@ -82,3 +85,12 @@ def extract_keywords_entities(request: KeywordEntityRequest):
     # Named entities
     entities = [{"text": ent.text, "label": ent.label_} for ent in doc.ents]
     return {"keywords": keywords, "entities": entities}
+
+@app.post("/embed")
+def embed_endpoint(request: EmbeddingRequest):
+    texts = request.texts
+    if not texts or not any(t.strip() for t in texts):
+        raise HTTPException(status_code=400, detail="Texts must not be empty.")
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+    embeddings = model.encode(texts)
+    return {"embeddings": embeddings.tolist()}
