@@ -11,7 +11,15 @@ tool_descriptions = {
     "Cosine Similarity": "Cosine Similarity\n\nCompare two texts and see how similar they are using cosine similarity.",
     "Readability Analyzer": "Readability Analyzer\n\nAnalyze the readability and complexity of your text using standard metrics.",
     "Keyword/Entity Extractor": "Keyword/Entity Extractor\n\nExtract keywords and named entities from your text for quick content analysis.",
-    "Embedding Visualizer": "Embedding Visualizer\n\nVisualize text embeddings in 2D/3D space to explore semantic relationships."
+    "Embedding Visualizer": "Embedding Visualizer\n\nVisualize text embeddings in 2D/3D space to explore semantic relationships.",
+    "Text Summarization": "Text Summarization\n\nGenerate concise summaries of long texts using LLMs.",
+    "Paraphrasing": "Paraphrasing\n\nRephrase or rewrite text in different words using LLMs.",
+    "Grammar/Spelling Correction": "Grammar/Spelling Correction\n\nAutomatically correct grammar and spelling mistakes using LLMs.",
+    "Prompt Enhancer": "Prompt Enhancer\n\nRewrite or expand prompts for better LLM results.",
+    "Prompt Generator": "Prompt Generator\n\nGenerate reusable prompt templates for common LLM tasks.",
+    "Few-shot Example Generator": "Few-shot Example Generator\n\nGenerate more high-quality few-shot examples for prompt engineering.",
+    "LLM Output Analyzer": "LLM Output Analyzer\n\nAnalyze LLM outputs for bias, toxicity, or hallucination.",
+    "Prompt Cost Estimator": "Prompt Cost Estimator\n\nEstimate the token/cost usage of a prompt for different LLMs."
 }
 
 # Sidebar layout
@@ -203,3 +211,28 @@ elif selected_tool == "Embedding Visualizer":
                     st.write(f"{row['text']}: ({row['x']:.2f}, {row['y']:.2f})")
             else:
                 st.error("Error: " + response.text)
+
+elif selected_tool == "Text Summarization":
+    st.header("Text Summarization")
+    st.info("This tool will generate concise summaries of long texts using LLMs. (Coming soon)")
+elif selected_tool == "Paraphrasing":
+    st.header("Paraphrasing")
+    st.info("This tool will rephrase or rewrite text in different words using LLMs. (Coming soon)")
+elif selected_tool == "Grammar/Spelling Correction":
+    st.header("Grammar/Spelling Correction")
+    st.info("This tool will automatically correct grammar and spelling mistakes using LLMs. (Coming soon)")
+elif selected_tool == "Prompt Enhancer":
+    st.header("Prompt Enhancer")
+    st.info("This tool will rewrite or expand prompts for better LLM results. (Coming soon)")
+elif selected_tool == "Prompt Generator":
+    st.header("Prompt Generator")
+    st.info("This tool will generate reusable prompt templates for common LLM tasks. (Coming soon)")
+elif selected_tool == "Few-shot Example Generator":
+    st.header("Few-shot Example Generator")
+    st.info("This tool will generate more high-quality few-shot examples for prompt engineering. (Coming soon)")
+elif selected_tool == "LLM Output Analyzer":
+    st.header("LLM Output Analyzer")
+    st.info("This tool will analyze LLM outputs for bias, toxicity, or hallucination. (Coming soon)")
+elif selected_tool == "Prompt Cost Estimator":
+    st.header("Prompt Cost Estimator")
+    st.info("This tool will estimate the token/cost usage of a prompt for different LLMs. (Coming soon)")
