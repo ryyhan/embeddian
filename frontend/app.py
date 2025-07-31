@@ -136,12 +136,70 @@ elif selected_tool == "Cosine Similarity":
 
 elif selected_tool == "Readability Analyzer":
     st.header("Readability Analyzer (Text Complexity)")
-    st.info("This tool will analyze the readability and complexity of your text. (Coming soon)")
+    text = st.text_area("Enter text to analyze readability:")
+    if st.button("Analyze Readability"):
+        if text.strip():
+            response = requests.post(f"{BACKEND_URL}/readability", json={"text": text})
+            if response.ok:
+                data = response.json()
+                st.subheader("Readability Metrics:")
+                st.write(f"Flesch Reading Ease: **{data['flesch_reading_ease']:.2f}**")
+                st.write(f"Flesch-Kincaid Grade: **{data['flesch_kincaid_grade']:.2f}**")
+                st.write(f"SMOG Index: **{data['smog_index']:.2f}**")
+                st.write(f"Coleman-Liau Index: **{data['coleman_liau_index']:.2f}**")
+                st.write(f"Automated Readability Index: **{data['automated_readability_index']:.2f}**")
+            else:
+                st.error("Error: " + response.text)
+        else:
+            st.warning("Please enter some text.")
 
 elif selected_tool == "Keyword/Entity Extractor":
     st.header("Keyword/Entity Extractor")
-    st.info("This tool will extract keywords and named entities from your text. (Coming soon)")
+    text = st.text_area("Enter text to extract keywords and entities:")
+    if st.button("Extract Keywords/Entities"):
+        if text.strip():
+            response = requests.post(f"{BACKEND_URL}/extract", json={"text": text})
+            if response.ok:
+                data = response.json()
+                st.subheader("Keywords:")
+                if data["keywords"]:
+                    st.write(", ".join(data["keywords"]))
+                else:
+                    st.write("No keywords found.")
+                st.subheader("Named Entities:")
+                if data["entities"]:
+                    for ent in data["entities"]:
+                        st.write(f"{ent['text']} ({ent['label']})")
+                else:
+                    st.write("No named entities found.")
+            else:
+                st.error("Error: " + response.text)
+        else:
+            st.warning("Please enter some text.")
 
 elif selected_tool == "Embedding Visualizer":
     st.header("Embedding Visualizer")
-    st.info("This tool will visualize text embeddings in 2D/3D space. (Coming soon)")
+    st.markdown("Enter multiple texts (one per line) to visualize their embeddings in 2D space.")
+    text_input = st.text_area("Enter texts (one per line):")
+    if st.button("Visualize Embeddings"):
+        texts = [t.strip() for t in text_input.splitlines() if t.strip()]
+        if len(texts) < 2:
+            st.warning("Please enter at least two texts.")
+        else:
+            response = requests.post(f"{BACKEND_URL}/embed", json={"texts": texts})
+            if response.ok:
+                data = response.json()
+                import numpy as np
+                from sklearn.decomposition import PCA
+                embeddings = np.array(data["embeddings"])
+                pca = PCA(n_components=2)
+                reduced = pca.fit_transform(embeddings)
+                import pandas as pd
+                df = pd.DataFrame(reduced, columns=["x", "y"])
+                df["text"] = texts
+                st.subheader("2D Embedding Visualization:")
+                st.scatter_chart(df, x="x", y="y")
+                for i, row in df.iterrows():
+                    st.write(f"{row['text']}: ({row['x']:.2f}, {row['y']:.2f})")
+            else:
+                st.error("Error: " + response.text)
