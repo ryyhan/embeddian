@@ -214,7 +214,19 @@ elif selected_tool == "Embedding Visualizer":
 
 elif selected_tool == "Text Summarization":
     st.header("Text Summarization")
-    st.info("This tool will generate concise summaries of long texts using LLMs. (Coming soon)")
+    text = st.text_area("Enter text to summarize:")
+    max_length = st.slider("Maximum summary length (words):", min_value=50, max_value=300, value=150, step=10)
+    if st.button("Generate Summary"):
+        if text.strip():
+            response = requests.post(f"{BACKEND_URL}/summarize", json={"text": text, "max_length": max_length})
+            if response.ok:
+                data = response.json()
+                st.subheader("Generated Summary:")
+                st.write(data["summary"])
+            else:
+                st.error("Error: " + response.text)
+        else:
+            st.warning("Please enter some text.")
 elif selected_tool == "Paraphrasing":
     st.header("Paraphrasing")
     st.info("This tool will rephrase or rewrite text in different words using LLMs. (Coming soon)")
