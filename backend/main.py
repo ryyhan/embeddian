@@ -22,6 +22,11 @@ class SummarizeRequest(BaseModel):
     text: str
     max_length: int = 150
 
+class ParaphraseRequest(BaseModel):
+    text: str
+
+
+
 @app.post("/tokenize")
 def tokenize(request: TokenizeRequest) -> Dict[str, int]:
     char_count = len(request.text)
@@ -85,6 +90,47 @@ def summarize_text(request: SummarizeRequest) -> Dict[str, str]:
             result = response.json()
             summary = result["choices"][0]["message"]["content"]
             return {"summary": summary}
+        else:
+            raise HTTPException(status_code=response.status_code, detail=f"OpenRouter API error: {response.text}")
+            
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Error calling OpenRouter API: {str(e)}")
+
+
+@app.post("/paraphrase")
+def paraphrase_text(request: ParaphraseRequest) -> Dict[str, str]:
+    OPENROUTER_API_KEY = "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"
+    OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+    
+    try:
+        response = requests.post(
+            OPENROUTER_URL,
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "deepseek/deepseek-r1:free",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are a helpful assistant that paraphrases text. Rephrase the given text in a different way while retaining its original meaning."
+                    },
+                    {
+                        "role": "user",
+                        "content": f"Please paraphrase the following text:\n\n{request.text}"
+                    }
+                ],
+                "max_tokens": 500,
+                "temperature": 0.7
+            },
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            result = response.json()
+            paraphrased_text = result["choices"][0]["message"]["content"]
+            return {"paraphrased_text": paraphrased_text}
         else:
             raise HTTPException(status_code=response.status_code, detail=f"OpenRouter API error: {response.text}")
             
