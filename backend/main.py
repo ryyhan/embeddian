@@ -5,10 +5,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import tiktoken
 from transformers import AutoTokenizer
-from sentence_transformers import SentenceTransformer
-import numpy as np
-from textstat import flesch_reading_ease, flesch_kincaid_grade, smog_index, coleman_liau_index, automated_readability_index
-import spacy
+import requests
 
 app = FastAPI()
 
@@ -21,14 +18,9 @@ class CosineSimilarityRequest(BaseModel):
     text1: str
     text2: str
 
-class ReadabilityRequest(BaseModel):
+class SummarizeRequest(BaseModel):
     text: str
-
-class KeywordEntityRequest(BaseModel):
-    text: str
-
-class EmbeddingRequest(BaseModel):
-    texts: list[str]
+    max_length: int = 150
 
 @app.post("/tokenize")
 def tokenize(request: TokenizeRequest) -> Dict[str, int]:
@@ -51,46 +43,50 @@ def tokenize(request: TokenizeRequest) -> Dict[str, int]:
 
 @app.post("/cosine-similarity")
 def cosine_similarity_endpoint(request: CosineSimilarityRequest) -> Dict[str, float]:
-    model = SentenceTransformer('all-MiniLM-L6-v2')
     texts = [request.text1, request.text2]
-    embeddings = model.encode(texts)
-    # Compute cosine similarity
-    if embeddings.shape[0] < 2:
+    vectorizer = CountVectorizer().fit_transform(texts)
+    vectors = vectorizer.toarray()
+    if vectors.shape[0] < 2:
         raise HTTPException(status_code=400, detail="Both texts must be non-empty.")
-    cos_sim = float(np.dot(embeddings[0], embeddings[1]) / (np.linalg.norm(embeddings[0]) * np.linalg.norm(embeddings[1])))
-    return {"cosine_similarity": cos_sim}
+    cos_sim = cosine_similarity([vectors[0]], [vectors[1]])[0][0]
+    return {"cosine_similarity": float(cos_sim)}
 
-@app.post("/readability")
-def readability_endpoint(request: ReadabilityRequest) -> Dict[str, float]:
-    text = request.text
-    if not text or not text.strip():
-        raise HTTPException(status_code=400, detail="Text must not be empty.")
-    return {
-        "flesch_reading_ease": flesch_reading_ease(text),
-        "flesch_kincaid_grade": flesch_kincaid_grade(text),
-        "smog_index": smog_index(text),
-        "coleman_liau_index": coleman_liau_index(text),
-        "automated_readability_index": automated_readability_index(text)
-    }
-
-@app.post("/extract")
-def extract_keywords_entities(request: KeywordEntityRequest):
-    text = request.text
-    if not text or not text.strip():
-        raise HTTPException(status_code=400, detail="Text must not be empty.")
-    nlp = spacy.load("en_core_web_sm")
-    doc = nlp(text)
-    # Simple keyword extraction: noun chunks
-    keywords = list(set(chunk.text.strip() for chunk in doc.noun_chunks if chunk.text.strip()))
-    # Named entities
-    entities = [{"text": ent.text, "label": ent.label_} for ent in doc.ents]
-    return {"keywords": keywords, "entities": entities}
-
-@app.post("/embed")
-def embed_endpoint(request: EmbeddingRequest):
-    texts = request.texts
-    if not texts or not any(t.strip() for t in texts):
-        raise HTTPException(status_code=400, detail="Texts must not be empty.")
-    model = SentenceTransformer('all-MiniLM-L6-v2')
-    embeddings = model.encode(texts)
-    return {"embeddings": embeddings.tolist()}
+@app.post("/summarize")
+def summarize_text(request: SummarizeRequest) -> Dict[str, str]:
+    OPENROUTER_API_KEY = "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"
+    OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+    
+    try:
+        response = requests.post(
+            OPENROUTER_URL,
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "deepseek/deepseek-r1:free",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": f"You are a helpful assistant that summarizes text. Provide a concise summary in {request.max_length} words or less."
+                    },
+                    {
+                        "role": "user",
+                        "content": f"Please summarize the following text:\n\n{request.text}"
+                    }
+                ],
+                "max_tokens": 500,
+                "temperature": 0.3
+            },
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            result = response.json()
+            summary = result["choices"][0]["message"]["content"]
+            return {"summary": summary}
+        else:
+            raise HTTPException(status_code=response.status_code, detail=f"OpenRouter API error: {response.text}")
+            
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Error calling OpenRouter API: {str(e)}")
