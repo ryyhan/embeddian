@@ -229,7 +229,18 @@ elif selected_tool == "Text Summarization":
             st.warning("Please enter some text.")
 elif selected_tool == "Paraphrasing":
     st.header("Paraphrasing")
-    st.info("This tool will rephrase or rewrite text in different words using LLMs. (Coming soon)")
+    text = st.text_area("Enter text to paraphrase:")
+    if st.button("Paraphrase Text"):
+        if text.strip():
+            response = requests.post(f"{BACKEND_URL}/paraphrase", json={"text": text})
+            if response.ok:
+                data = response.json()
+                st.subheader("Paraphrased Text:")
+                st.write(data["paraphrased_text"])
+            else:
+                st.error("Error: " + response.text)
+        else:
+            st.warning("Please enter some text.")
 elif selected_tool == "Grammar/Spelling Correction":
     st.header("Grammar/Spelling Correction")
     st.info("This tool will automatically correct grammar and spelling mistakes using LLMs. (Coming soon)")
