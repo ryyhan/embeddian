@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from textblob import TextBlob
 from pydantic import BaseModel
 from typing import Dict
 from sklearn.feature_extraction.text import CountVectorizer
@@ -23,6 +24,9 @@ class SummarizeRequest(BaseModel):
     max_length: int = 150
 
 class ParaphraseRequest(BaseModel):
+    text: str
+
+class GrammarCorrectionRequest(BaseModel):
     text: str
 
 
@@ -99,6 +103,11 @@ def summarize_text(request: SummarizeRequest) -> Dict[str, str]:
 
 @app.post("/paraphrase")
 def paraphrase_text(request: ParaphraseRequest) -> Dict[str, str]:
+
+@app.post("/grammar-correction")
+def grammar_correction(request: GrammarCorrectionRequest) -> Dict[str, str]:
+    corrected_text = str(TextBlob(request.text).correct())
+    return {"corrected_text": corrected_text}
     OPENROUTER_API_KEY = "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"
     OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
     

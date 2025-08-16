@@ -243,7 +243,18 @@ elif selected_tool == "Paraphrasing":
             st.warning("Please enter some text.")
 elif selected_tool == "Grammar/Spelling Correction":
     st.header("Grammar/Spelling Correction")
-    st.info("This tool will automatically correct grammar and spelling mistakes using LLMs. (Coming soon)")
+    text = st.text_area("Enter text to correct grammar and spelling:")
+    if st.button("Correct Text"):
+        if text.strip():
+            response = requests.post(f"{BACKEND_URL}/grammar-correction", json={"text": text})
+            if response.ok:
+                data = response.json()
+                st.subheader("Corrected Text:")
+                st.write(data["corrected_text"])
+            else:
+                st.error("Error: " + response.text)
+        else:
+            st.warning("Please enter some text.")
 elif selected_tool == "Prompt Enhancer":
     st.header("Prompt Enhancer")
     st.info("This tool will rewrite or expand prompts for better LLM results. (Coming soon)")
