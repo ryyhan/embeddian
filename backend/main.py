@@ -29,6 +29,9 @@ class ParaphraseRequest(BaseModel):
 class GrammarCorrectionRequest(BaseModel):
     text: str
 
+class PromptEnhancerRequest(BaseModel):
+    text: str
+
 
 
 @app.post("/tokenize")
@@ -108,6 +111,11 @@ def paraphrase_text(request: ParaphraseRequest) -> Dict[str, str]:
 def grammar_correction(request: GrammarCorrectionRequest) -> Dict[str, str]:
     corrected_text = str(TextBlob(request.text).correct())
     return {"corrected_text": corrected_text}
+
+@app.post("/prompt-enhancer")
+def prompt_enhancer(request: PromptEnhancerRequest) -> Dict[str, str]:
+    enhanced_prompt = f"Enhanced Prompt: {request.text} - Make it more engaging and detailed."
+    return {"enhanced_prompt": enhanced_prompt}
     OPENROUTER_API_KEY = "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"
     OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
     

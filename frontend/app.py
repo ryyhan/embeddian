@@ -257,7 +257,18 @@ elif selected_tool == "Grammar/Spelling Correction":
             st.warning("Please enter some text.")
 elif selected_tool == "Prompt Enhancer":
     st.header("Prompt Enhancer")
-    st.info("This tool will rewrite or expand prompts for better LLM results. (Coming soon)")
+    text = st.text_area("Enter a prompt to enhance:")
+    if st.button("Enhance Prompt"):
+        if text.strip():
+            response = requests.post(f"{BACKEND_URL}/prompt-enhancer", json={"text": text})
+            if response.ok:
+                data = response.json()
+                st.subheader("Enhanced Prompt:")
+                st.write(data["enhanced_prompt"])
+            else:
+                st.error("Error: " + response.text)
+        else:
+            st.warning("Please enter a prompt.")
 elif selected_tool == "Prompt Generator":
     st.header("Prompt Generator")
     st.info("This tool will generate reusable prompt templates for common LLM tasks. (Coming soon)")
