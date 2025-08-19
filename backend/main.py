@@ -32,6 +32,9 @@ class GrammarCorrectionRequest(BaseModel):
 class PromptEnhancerRequest(BaseModel):
     text: str
 
+class PromptGeneratorRequest(BaseModel):
+    task_description: str
+
 
 
 @app.post("/tokenize")
@@ -116,6 +119,11 @@ def grammar_correction(request: GrammarCorrectionRequest) -> Dict[str, str]:
 def prompt_enhancer(request: PromptEnhancerRequest) -> Dict[str, str]:
     enhanced_prompt = f"Enhanced Prompt: {request.text} - Make it more engaging and detailed."
     return {"enhanced_prompt": enhanced_prompt}
+
+@app.post("/prompt-generator")
+def prompt_generator(request: PromptGeneratorRequest) -> Dict[str, str]:
+    generated_prompt = f"Generated Prompt: Create a task for '{request.task_description}' with clear instructions and examples."
+    return {"generated_prompt": generated_prompt}
     OPENROUTER_API_KEY = "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"
     OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
     
