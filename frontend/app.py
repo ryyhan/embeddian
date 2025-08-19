@@ -271,7 +271,18 @@ elif selected_tool == "Prompt Enhancer":
             st.warning("Please enter a prompt.")
 elif selected_tool == "Prompt Generator":
     st.header("Prompt Generator")
-    st.info("This tool will generate reusable prompt templates for common LLM tasks. (Coming soon)")
+    task_description = st.text_area("Enter a task description:")
+    if st.button("Generate Prompt"):
+        if task_description.strip():
+            response = requests.post(f"{BACKEND_URL}/prompt-generator", json={"task_description": task_description})
+            if response.ok:
+                data = response.json()
+                st.subheader("Generated Prompt:")
+                st.write(data["generated_prompt"])
+            else:
+                st.error("Error: " + response.text)
+        else:
+            st.warning("Please enter a task description.")
 elif selected_tool == "Few-shot Example Generator":
     st.header("Few-shot Example Generator")
     st.info("This tool will generate more high-quality few-shot examples for prompt engineering. (Coming soon)")
