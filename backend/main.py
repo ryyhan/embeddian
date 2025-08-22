@@ -35,6 +35,10 @@ class PromptEnhancerRequest(BaseModel):
 class PromptGeneratorRequest(BaseModel):
     task_description: str
 
+class FewShotExampleGeneratorRequest(BaseModel):
+    text: str
+    examples_count: int
+
 
 
 @app.post("/tokenize")
@@ -124,6 +128,11 @@ def prompt_enhancer(request: PromptEnhancerRequest) -> Dict[str, str]:
 def prompt_generator(request: PromptGeneratorRequest) -> Dict[str, str]:
     generated_prompt = f"Generated Prompt: Create a task for '{request.task_description}' with clear instructions and examples."
     return {"generated_prompt": generated_prompt}
+
+@app.post("/few-shot-example-generator")
+def few_shot_example_generator(request: FewShotExampleGeneratorRequest) -> Dict[str, list]:
+    examples = [f"Example {i+1}: {request.text}" for i in range(request.examples_count)]
+    return {"examples": examples}
     OPENROUTER_API_KEY = "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"
     OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
     

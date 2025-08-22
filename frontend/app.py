@@ -285,7 +285,20 @@ elif selected_tool == "Prompt Generator":
             st.warning("Please enter a task description.")
 elif selected_tool == "Few-shot Example Generator":
     st.header("Few-shot Example Generator")
-    st.info("This tool will generate more high-quality few-shot examples for prompt engineering. (Coming soon)")
+    text = st.text_area("Enter text for examples:")
+    examples_count = st.slider("Number of examples:", min_value=1, max_value=10, value=5)
+    if st.button("Generate Examples"):
+        if text.strip():
+            response = requests.post(f"{BACKEND_URL}/few-shot-example-generator", json={"text": text, "examples_count": examples_count})
+            if response.ok:
+                data = response.json()
+                st.subheader("Generated Examples:")
+                for example in data["examples"]:
+                    st.write(example)
+            else:
+                st.error("Error: " + response.text)
+        else:
+            st.warning("Please enter some text.")
 elif selected_tool == "LLM Output Analyzer":
     st.header("LLM Output Analyzer")
     st.info("This tool will analyze LLM outputs for bias, toxicity, or hallucination. (Coming soon)")
