@@ -301,7 +301,21 @@ elif selected_tool == "Few-shot Example Generator":
             st.warning("Please enter some text.")
 elif selected_tool == "LLM Output Analyzer":
     st.header("LLM Output Analyzer")
-    st.info("This tool will analyze LLM outputs for bias, toxicity, or hallucination. (Coming soon)")
+    st.markdown("Analyze LLM outputs for coherence, relevance, and sentiment.")
+    text = st.text_area("Enter LLM output to analyze:")
+    if st.button("Analyze Output"):
+        if text.strip():
+            response = requests.post(f"{BACKEND_URL}/llm-output-analyzer", json={"text": text})
+            if response.ok:
+                data = response.json()
+                st.subheader("Analysis Results:")
+                st.write(f"Coherence: {data['analysis']['coherence']}")
+                st.write(f"Relevance: {data['analysis']['relevance']}")
+                st.write(f"Sentiment: {data['analysis']['sentiment']}")
+            else:
+                st.error("Error: " + response.text)
+        else:
+            st.warning("Please enter some text.")
 elif selected_tool == "Prompt Cost Estimator":
     st.header("Prompt Cost Estimator")
     st.info("This tool will estimate the token/cost usage of a prompt for different LLMs. (Coming soon)")
